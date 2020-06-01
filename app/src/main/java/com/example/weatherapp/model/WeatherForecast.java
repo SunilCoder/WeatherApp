@@ -1,6 +1,8 @@
 package com.example.weatherapp.model;
 
-public class WeatherForecast {
+import java.io.Serializable;
+
+public class WeatherForecast implements Serializable {
     private String valid_date;
     private long ts;
     private double temp;
@@ -9,7 +11,13 @@ public class WeatherForecast {
     private double app_max_temp;
     private Weather weather;
     private double vis;
+    private double uv;
+    private double rh;
+    private long sunrise_ts;
+    private long sunset_ts;
     private double wind_spd;
+    private double wind_dir;
+    private String wind_cdir_full;
 
     public double getWind_spd(){return wind_spd;}
 
@@ -81,8 +89,51 @@ public class WeatherForecast {
         this.vis = vis;
     }
 
+    public double getUv() {
+        return uv;
+    }
 
+    public void setUv(double uv) {
+        this.uv = uv;
+    }
 
+    public long getSunrise_ts() {
+        return sunrise_ts;
+    }
 
+    public void setSunrise_ts(long sunrise_ts) {
+        this.sunrise_ts = sunrise_ts;
+    }
 
+    public long getSunset_ts() {
+        return sunset_ts;
+    }
+
+    public void setSunset_ts(long sunset_ts) {
+        this.sunset_ts = sunset_ts;
+    }
+
+    public double getRh() {
+        return rh;
+    }
+
+    public void setRh(double rh) {
+        this.rh = rh;
+    }
+
+    public double getWind_dir() {
+        return wind_dir;
+    }
+
+    public void setWind_dir(double wind_dir) {
+        this.wind_dir = wind_dir;
+    }
+
+    public String getWind_cdir_full() {
+        return wind_cdir_full;
+    }
+
+    public void setWind_cdir_full(String wind_cdir_full) {
+        this.wind_cdir_full = wind_cdir_full;
+    }
 }

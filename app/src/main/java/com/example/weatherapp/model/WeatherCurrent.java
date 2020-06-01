@@ -13,6 +13,13 @@ public class WeatherCurrent {
     private double wind_spd;
     private double precip;
     private double vis;
+    private double uv;
+    private String sunrise;
+    private String sunset;
+    private double rh;
+    private double wind_dir;
+    private String wind_cdir_full;
+
 
     public String getPod() {
         return pod;
@@ -100,5 +107,53 @@ public class WeatherCurrent {
 
     public void setVis(double vis) {
         this.vis = vis;
+    }
+
+    public double getUv() {
+        return uv;
+    }
+
+    public void setUv(double uv) {
+        this.uv = uv;
+    }
+
+    public String getSunrise() {
+        return sunrise;
+    }
+
+    public void setSunrise(String sunrise) {
+        this.sunrise = sunrise;
+    }
+
+    public String getSunset() {
+        return sunset;
+    }
+
+    public void setSunset(String sunset) {
+        this.sunset = sunset;
+    }
+
+    public double getRh() {
+        return rh;
+    }
+
+    public void setRh(double rh) {
+        this.rh = rh;
+    }
+
+    public double getWind_dir() {
+        return wind_dir;
+    }
+
+    public void setWind_dir(double wind_dir) {
+        this.wind_dir = wind_dir;
+    }
+
+    public String getWind_cdir_full() {
+        return wind_cdir_full;
+    }
+
+    public void setWind_cdir_full(String wind_cdir_full) {
+        this.wind_cdir_full = wind_cdir_full;
     }
 }

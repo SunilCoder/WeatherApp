@@ -8,74 +8,104 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
+        app:liftOnScroll="true"
         android:layout_height="wrap_content">
-
         <androidx.appcompat.widget.Toolbar
+            app:title="Weather"
+            android:id="@+id/weatherToolbar"
+
             android:layout_width="match_parent"
-            android:layout_height="?actionBarSize">
+            android:layout_height="?actionBarSize"/>
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/homeTablayout"
+            app:tabIndicatorColor="@color/fbwhite"
+            app:tabSelectedTextColor="@color/fbwhite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:tabTextColor="@color/LightGrey">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:elevation="4dp"
-                    app:cardCornerRadius="6dp"
-                    android:layout_margin="8dp"
-                    >
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/Current"
+                android:text="Current"/>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal">
-
-                    <EditText
-                        android:id="@+id/et_searchAdress"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:hint="Search"
-                        android:layout_gravity="center_vertical"
-                        android:layout_weight="1"
-                        android:padding="8dp"
-                        android:background="@null"
-                        android:inputType="text"
-                        android:imeOptions="actionDone"
-                        android:textColor="@color/fbwhite"
-                        android:textSize="18sp"
-                        />
-
-                        <ImageView
-                            android:id="@+id/iv_locations"
-                            android:layout_width="50dp"
-                            android:layout_height="30dp"
-                            android:layout_marginTop="8dp"
-                            android:src="@drawable/ic_search"
-                            android:tint="@color/fbwhite" />
-
-                    </LinearLayout>
-
-
-                </com.google.android.material.card.MaterialCardView>
-        </androidx.appcompat.widget.Toolbar>
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ForeCast"
+                android:text="ForeCast"/>
+        </com.google.android.material.tabs.TabLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_constraint"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?actionBarSize">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.viewpager.widget.ViewPager
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/currentViewPager"/>
+
+     <!--   <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="8dp"
+            android:layout_marginStart="8dp"
+            android:elevation="4dp"
+            app:cardCornerRadius="6dp"
+            app:layout_constraintEnd_toStartOf="@+id/tv_locationName"
+            app:layout_constraintStart_toEndOf="@+id/currentViewPager"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/et_searchAdress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="Search"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:padding="8dp"
+                    android:textColor="@color/fbwhite"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/iv_locations"
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/ic_search"
+                    android:tint="@color/fbwhite" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
 
         <ImageView
             android:id="@+id/imageView3"
-            android:layout_width="30dp"
+            android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_location"
             android:tint="@color/fbwhite"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_locationName"
+            app:layout_constraintBottom_toTopOf="@+id/tv_date"
             app:layout_constraintEnd_toStartOf="@+id/tv_locationName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tv_locationName" />
-
 
         <TextView
             android:id="@+id/tv_locationName"
@@ -86,7 +116,9 @@
             android:text="Melbourne"
             android:textColor="@color/fbwhite"
             android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_date"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/imageView3"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -94,7 +126,7 @@
             android:id="@+id/tv_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="16dp"
             android:fontFamily="@font/euclid_circular_light"
             android:text="Thursday 15 November 2019"
             android:textColor="@color/fbwhite"
@@ -106,32 +138,32 @@
 
         <ImageView
             android:id="@+id/iv_temperatureIcon"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="16dp"
+            android:layout_width="126dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="24dp"
             android:scaleType="fitCenter"
             android:src="@drawable/sun"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_temperature"
+            app:layout_constraintEnd_toStartOf="@+id/tv_temperature"
+            app:layout_constraintHorizontal_bias="0.62"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_date" />
-
+            app:layout_constraintTop_toTopOf="@+id/tv_temperature" />
 
         <TextView
             android:id="@+id/tv_temperature"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:fontFamily="@font/euclid_circular_light"
-            android:gravity="center"
             android:text="28°"
             android:textColor="@color/fbwhite"
-            android:textSize="40sp"
+            android:textSize="@dimen/material_text_display3"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/iv_temperatureIcon" />
+            app:layout_constraintStart_toEndOf="@+id/iv_temperatureIcon"
+            app:layout_constraintTop_toBottomOf="@+id/tv_date" />
+
 
         <TextView
             android:id="@+id/tv_description"
@@ -143,9 +175,9 @@
             android:textColor="@color/fbwhite"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_temperature" />
-
+            tools:layout_editor_absoluteY="225dp" />
 
         <TextView
             android:id="@+id/tv_wind"
@@ -236,22 +268,11 @@
             android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView6" />
+            app:layout_constraintTop_toBottomOf="@+id/textView6" />-->
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ProgressBar
-        android:id="@+id/progress_circular"
-        style="?progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/tv_temperature"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_locationName" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

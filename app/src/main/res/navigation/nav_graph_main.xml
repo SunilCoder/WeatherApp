@@ -9,5 +9,14 @@
         android:id="@+id/homeFragment"
         android:name="com.example.weatherapp.Fragment.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_detailedViewFragment"
+            app:destination="@id/detailedViewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailedViewFragment"
+        android:name="com.example.weatherapp.Fragment.DetailedViewFragment"
+        android:label="fragment_detailed_view"
+        tools:layout="@layout/fragment_detailed_view" />
 </navigation>

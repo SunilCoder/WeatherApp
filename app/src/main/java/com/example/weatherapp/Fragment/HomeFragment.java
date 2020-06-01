@@ -2,6 +2,8 @@ package com.example.weatherapp.Fragment;
 
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -14,11 +16,16 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +37,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.weatherapp.R;
+import com.example.weatherapp.Utils.AlarmReceiver;
 import com.example.weatherapp.Utils.LocationUtilis;
+import com.example.weatherapp.Utils.PageAdapter;
 import com.example.weatherapp.Utils.Pref;
 import com.example.weatherapp.Utils.RequestCode;
 import com.example.weatherapp.Utils.Utilis;
@@ -57,6 +66,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -70,6 +81,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import static androidx.core.app.ActivityCompat.requestPermissions;
+import static androidx.core.content.ContextCompat.getSystemServiceName;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -80,6 +92,12 @@ public class HomeFragment extends Fragment {
     private ArrayList<String> days = new ArrayList<>();
     private ArrayList<Integer> images = new ArrayList<>();
     private ArrayList<String> temperature = new ArrayList<>();
+
+    private TabLayout tabLayout;
+    private TabItem tb_home,tb_forecast;
+    private ViewPager viewPager;
+    private NavController navController;
+    private Toolbar toolbar;
 
     private List<WeatherForecast> weatherForecasts;
     RecyclerView.Adapter mAdapter;
@@ -110,7 +128,16 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        recyclerView = view.findViewById(R.id.comingdays);
+        tabLayout = view.findViewById(R.id.homeTablayout);
+        tb_home = view.findViewById(R.id.Current);
+        tb_forecast =view.findViewById(R.id.ForeCast);
+        navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment);
+        viewPager = view.findViewById(R.id.currentViewPager);
+        toolbar = view.findViewById(R.id.weatherToolbar);
+
+
+
+      /*  recyclerView = view.findViewById(R.id.comingdays);
         tv_locationName = view.findViewById(R.id.tv_locationName);
         tv_date = view.findViewById(R.id.tv_date);
         tv_temperature = view.findViewById(R.id.tv_temperature);
@@ -123,34 +150,79 @@ public class HomeFragment extends Fragment {
         constraintLayout = view.findViewById(R.id.layout_constraint);
         progressBar = view.findViewById(R.id.progress_circular);
         et_searchAddress = view.findViewById(R.id.et_searchAdress);
-        iv_search = view.findViewById(R.id.iv_locations);
-
-
+        iv_search = view.findViewById(R.id.iv_locations);*/
         return view;
     }
+
 
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        pref = new Pref(getContext());
+        PagerAdapter pagerAdapter = new PageAdapter(getChildFragmentManager(),tabLayout.getTabCount());
+        int limit = pagerAdapter.getCount()>1?pagerAdapter.getCount()-1:1;
+        viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(limit);
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
-        createLocationRequest();
-        createLocationcall();
-        checkPermisiion();
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+            viewPager.setCurrentItem(tab.getPosition());
 
-        iv_search.setOnClickListener(new View.OnClickListener() {
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if(position==1){
+                    pref= new Pref(requireContext());
+                    //loadData();
+                    Log.d("jumboo", "onPageSelected: "+pref.getLocation());
+
+                }
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                tabLayout.getTabAt(position).select();
+               // Log.d("jumboo", "onPageSelected: "+tabLayout.getTabAt(position));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+
+       // fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
+        //createLocationRequest();
+        //createLocationcall();
+        //checkPermisiion();
+
+      /*  iv_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 search();
                 displayProgress(true);
             }
-        });
+        })*/;
 
 
 
-        displayProgress(true);
+        //displayProgress(true);
 
 
         days.add("Friday");
@@ -173,7 +245,7 @@ public class HomeFragment extends Fragment {
             images.add(R.drawable.sun);
         }
 
-        buildRecyclerView();
+        //buildRecyclerView();
 
 
     }
@@ -181,12 +253,12 @@ public class HomeFragment extends Fragment {
     private void search() {
         String enteredLocations = et_searchAddress.getText().toString();
         //tv_locationName.setText(enteredLocations);
-        networkcall(enteredLocations);
+        //networkcall(enteredLocations);
 
 
     }
 
-    private void displayProgress(boolean isLoading) {
+  /*  private void displayProgress(boolean isLoading) {
         if (isLoading) {
             progressBar.setVisibility(View.VISIBLE);
             constraintLayout.setVisibility(View.GONE);
@@ -195,9 +267,9 @@ public class HomeFragment extends Fragment {
             constraintLayout.setVisibility(View.VISIBLE);
         }
 
-    }
+    }*/
 
-    public String getCompleteAdress(double Latitude, double Longtitude) {
+   /* public String getCompleteAdress(double Latitude, double Longtitude) {
         String strAdd = "";
         Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
         try {
@@ -213,8 +285,8 @@ public class HomeFragment extends Fragment {
 
 
     }
-
-    private void checkPermisiion() {
+*/
+   /* private void checkPermisiion() {
         if (!hasLocationPermision()) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, RequestCode.REQUEST_LOCATION);
 
@@ -222,9 +294,8 @@ public class HomeFragment extends Fragment {
             checkLocationSettings();
         }
 
-    }
-
-    private void checkLocationSettings() {
+    }*/
+    /*private void checkLocationSettings() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
         SettingsClient client = LocationServices.getSettingsClient(getContext());
@@ -251,9 +322,9 @@ public class HomeFragment extends Fragment {
 
             }
         });
-    }
+    }*/
 
-    public void startLocationUpdate() {
+   /* public void startLocationUpdate() {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
     }
 
@@ -268,8 +339,8 @@ public class HomeFragment extends Fragment {
         }
         return true;
     }
-
-    public void createLocationcall() {
+*/
+    /*public void createLocationcall() {
         locationCallback = new LocationCallback() {
 
             @Override
@@ -290,8 +361,8 @@ public class HomeFragment extends Fragment {
             }
         };
     }
-
-    private void networkcall(final String address) {
+*/
+   /* private void networkcall(final String address) {
         Retrofit retrofit = RestClinet.getClient();
         ApiInterface apiInterface = retrofit.create(ApiInterface.class);
         Call<WeatherForecastResponse> currentWeatherCall = apiInterface.getForecastWeather(address, 7, "35efeec91b474b228f75e97447d1fde4");
@@ -308,7 +379,7 @@ public class HomeFragment extends Fragment {
                         WeatherForecastResponse rs = response.body();
 
                         List<WeatherForecast> data = rs.getData();
-                        setData(data);
+                        //setData(data);
                         setRecylerView(data);
                     }else{
                         Snackbar.make(tv_locationName, "Enter the correct location", Snackbar.LENGTH_LONG).show();
@@ -325,21 +396,22 @@ public class HomeFragment extends Fragment {
             public void onFailure(Call<WeatherForecastResponse> call, Throwable t) {
                 displayProgress(false);
                 Log.d("sunil", "onFailure: " + t.getMessage());
+                  Snackbar.make(tv_locationName, t.getMessage(), Snackbar.LENGTH_LONG).show();
                 Snackbar.make(tv_locationName, t.getMessage(), Snackbar.LENGTH_LONG).show();
 
             }
         });
 
-    }
+    }*/
 
-    private void setRecylerView(List<WeatherForecast> data) {
+  /*  private void setRecylerView(List<WeatherForecast> data) {
         mAdapter = new mAdapter(data, getContext());
         recyclerView.setAdapter(mAdapter);
 
 
-    }
+    }*/
 
-    private void setData(List<WeatherForecast> weahterForcast) {
+    /*private void setData(List<WeatherForecast> weahterForcast) {
         if (weahterForcast != null) {
 
 
@@ -370,9 +442,9 @@ public class HomeFragment extends Fragment {
             //tv_date.setText(Utilis.convertMIllistoDate(location.getLocaltime_epoch()));
         }
 
-    }
+    }*/
 
-    private void createLocationRequest() {
+   /* private void createLocationRequest() {
         locationRequest = new LocationRequest();
         locationRequest.setInterval(1000 * 60 * 10);
         locationRequest.setFastestInterval(1000 * 60 * 5);
@@ -380,10 +452,10 @@ public class HomeFragment extends Fragment {
 
 
     }
+*/
 
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    //@Override
+  /*  public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RequestCode.REQUEST_CHECK_SETTINGS) {
             if (resultCode == getActivity().RESULT_OK) {
@@ -392,20 +464,9 @@ public class HomeFragment extends Fragment {
             }
         }
     }
+*/
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        startLocationUpdate();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        stopLocationUpdate();
-    }
-
-    private void buildRecyclerView() {
+ /*   private void buildRecyclerView() {
 
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
@@ -467,5 +528,5 @@ public class HomeFragment extends Fragment {
 
             }
         }
-    }
+    }*/
 }

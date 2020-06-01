@@ -1,6 +1,11 @@
 package com.example.weatherapp.Utils;
 
+import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
+import android.util.SparseArray;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Switch;
 
 import java.text.ParseException;
@@ -11,14 +16,27 @@ import java.util.Locale;
 
 public class Utilis {
 
+    public static void hideKeyboard(Context context, View view){
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+    }
 
-    public static String convertMIllistoDate(long millis) {
+
+    public static String  convertMIllistoDate(long millis) {
         SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
         int day = calendar.get(Calendar.DAY_OF_WEEK);
         return day + " " + outputFormat.format(calendar.getTime());
+    }
+
+    public static String  convertMilistoTime(long millis){
+        SimpleDateFormat outputFormat = new SimpleDateFormat("h:m", Locale.ENGLISH);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+        return  outputFormat.format(calendar.getTime());
+
     }
 
 
